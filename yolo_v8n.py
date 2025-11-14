@@ -12,7 +12,6 @@ import platform
 import pyautogui
 from pynput import mouse
 
-# --- Configuración global y carga del modelo ---
 print("Cargando modelo YOLO con detección normal...")
 
 # Intentar cargar modelos normales en orden de tamaño
@@ -27,7 +26,6 @@ model_options = [
 model = None
 model_type = None
 
-# Primero verificar si los archivos existen localmente
 available_models = []
 for model_path in model_options:
     if os.path.exists(model_path):
@@ -38,13 +36,12 @@ if not available_models:
     print(" No se encontraron modelos localmente.")
     print(" Intentando descargar automáticamente...")
     print("   (Si falla, descarga manualmente desde: https://github.com/ultralytics/assets/releases)")
-    available_models = model_options  # Intentar todos
+    available_models = model_options  
 
 # Intentar cargar los modelos disponibles
 for model_path in available_models:
     try:
         print(f"Intentando cargar {model_path}...")
-        # Si el archivo no existe, YOLO intentará descargarlo automáticamente
         model = YOLO(model_path)
         model_type = model_path.replace('.pt', '')
         print(f" Modelo {model_type} cargado exitosamente!")
@@ -73,7 +70,6 @@ if model is None:
     print("="*60)
     sys.exit(1)
 
-# Carga los nombres de las clases (personas, coches, etc.) del dataset COCO
 classesFile = "coco.names"
 try:
     with open(classesFile, 'rt') as f:
@@ -86,10 +82,6 @@ except FileNotFoundError:
 # Genera colores aleatorios para dibujar los recuadros de las clases
 COLORS = np.random.uniform(0, 255, size=(len(classes), 3))
 
-# Configuración de detección normal (sin esqueletos)
-# El modelo normal detecta objetos pero no keypoints de pose
-
-# --- Configuración de la captura de pantalla ---
 sct = mss()
 
 # Mostrar información de monitores disponibles
@@ -100,7 +92,7 @@ for i, monitor in enumerate(sct.monitors):
 # Configurar captura del monitor 2 (pantalla que se revisa por la IA)
 if len(sct.monitors) > 2:
     monitor_area = sct.monitors[2]  # Monitor 2 - pantalla que se revisa
-    print(f"📹 Capturando desde: Monitor 2 - {monitor_area['width']}x{monitor_area['height']} en ({monitor_area['left']}, {monitor_area['top']})")
+    print(f" Capturando desde: Monitor 2 - {monitor_area['width']}x{monitor_area['height']} en ({monitor_area['left']}, {monitor_area['top']})")
 else:
     # Si no hay monitor 2, usar monitor 1 como respaldo
     monitor_area = sct.monitors[1]
@@ -111,21 +103,20 @@ else:
 capture_monitor = monitor_area
 print(f"El mouse se moverá en las coordenadas del monitor de captura: ({capture_monitor['left']}, {capture_monitor['top']})")
 
-# --- Variables globales para Tkinter ---
 root = None
 label = None
 running = True
 
-# --- Variables globales para detección de mouse ---
+# Variables globales para detección de mouse 
 left_button_pressed = False
 right_button_pressed = False
-detected_boxes = []  # Almacenar los cuadrados detectados más recientes
+detected_boxes = []  
 mouse_listener = None
 last_mouse_move_time = 0  # Para evitar múltiples movimientos rápidos
 MOUSE_MOVE_COOLDOWN = 0.5  # Segundos entre movimientos de mouse
 
-# --- Configuración de precisión ---
-# Ajusta estos valores para mejorar la precisión:
+# Configuración de precisión 
+
 CONFIDENCE_THRESHOLD = 0.25  # Umbral de confianza más bajo para detectar más (0.1-1.0)
 IOU_THRESHOLD = 0.2          # Umbral de IoU más bajo para detectar más (0.1-0.9)
 CLASSES_TO_DETECT = [0]      # 0 = persona, puedes agregar más clases si quieres
@@ -138,7 +129,7 @@ print(f"- Máximo detecciones: {MAX_DETECTIONS}")
 print(f"- Clases detectadas: {CLASSES_TO_DETECT}")
 print(f"- Modelo usado: {model_type}")
 
-# --- Funciones para detección de mouse ---
+#  Funciones para detección de mouse 
 def on_mouse_click(x, y, button, pressed):
     """Callback para detectar clicks del mouse"""
     global left_button_pressed, right_button_pressed, last_mouse_move_time
@@ -156,7 +147,7 @@ def on_mouse_click(x, y, button, pressed):
         move_mouse_to_nearest_box(x, y)
         last_mouse_move_time = current_time
     
-    return True  # Continuar escuchando
+    return True  
 
 def move_mouse_to_nearest_box(current_x, current_y):
     """Mueve el mouse al centro del cuadrado detectado más cercano en la pantalla de captura (Monitor 2)"""
@@ -212,7 +203,7 @@ def start_mouse_listener():
         print(f" Error iniciando listener de mouse: {e}")
         print(" La funcionalidad de movimiento de mouse no estará disponible.")
 
-# --- Funciones ---
+# Funciones 
 def onClossing():
     """Función para limpiar y cerrar la aplicación al cerrar la ventana."""
     global running, mouse_listener
@@ -247,7 +238,7 @@ def process_frame():
             # 1. Capturar la pantalla del monitor principal usando la instancia del hilo
             sct_img = thread_sct.grab(monitor_area)
             frame = np.array(sct_img)
-            # Convertir de RGBA (mss) a BGR (OpenCV)
+        
             frame = cv2.cvtColor(frame, cv2.COLOR_RGBA2BGR)
             
             # Opcional: Redimensionar para mejor rendimiento/precisión
@@ -269,11 +260,9 @@ def process_frame():
                 )
             except Exception as predict_error:
                 print(f"Error en predicción: {predict_error}")
-                # Continuar con el siguiente frame
                 time.sleep(0.01)
                 continue
             
-            # Crear un frame negro del mismo tamaño
             height, width = frame.shape[:2]
             annotated_frame = np.zeros((height, width, 3), dtype=np.uint8)
             
@@ -283,7 +272,6 @@ def process_frame():
             # Limpiar lista de cuadrados detectados para este frame
             detected_boxes.clear()
             
-            # Procesar resultados
             for result in results:
                 boxes = result.boxes
                 
@@ -378,7 +366,7 @@ def update_label(tkimage):
         label.configure(image=tkimage)
         label.image = tkimage
 
-# --- Inicialización de la Interfaz Gráfica (Tkinter) ---
+# Inicialización de la Interfaz Gráfica (Tkinter)
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", onClossing)
 root.title(f"Detección de Personas en Pantalla ({model_type.upper()})")
@@ -397,15 +385,15 @@ if len(sct.monitors) > 2:
     if is_capturing_monitor_2:
         # Si capturamos del Monitor 2, mostrar en Monitor 1
         display_monitor = sct.monitors[1]
-        print(f"📺 Visualización en Monitor 1 (diferente al Monitor 2 de captura)")
+        print(f" Visualización en Monitor 1 (diferente al Monitor 2 de captura)")
     else:
         # Si capturamos del Monitor 1, intentar usar Monitor 2 si existe
         if len(sct.monitors) > 2:
             display_monitor = sct.monitors[2]
-            print(f"📺 Visualización en Monitor 2 (diferente al Monitor 1 de captura)")
+            print(f" Visualización en Monitor 2 (diferente al Monitor 1 de captura)")
         else:
             display_monitor = sct.monitors[1]
-            print(f"📺 Visualización en Monitor 1")
+            print(f" Visualización en Monitor 1")
     
     if display_monitor:
         root.geometry(f"+{display_monitor['left']}+{display_monitor['top']}")
@@ -443,12 +431,12 @@ label.grid(row=0, column=0, padx=10, pady=10)
 # --- Inicio del procesamiento ---
 try:
     print("\n" + "="*60)
-    print("🚀 Iniciando detección de personas")
+    print(" Iniciando detección de personas")
     print("="*60)
-    print(f"📹 Monitor de CAPTURA (revisado por IA):")
+    print(f" Monitor de CAPTURA (revisado por IA):")
     print(f"   - Monitor 2: {capture_monitor['width']}x{capture_monitor['height']}")
     print(f"   - Posición: ({capture_monitor['left']}, {capture_monitor['top']})")
-    print(f"\n📺 Monitor de VISUALIZACIÓN (donde se muestran los cuadros):")
+    print(f"\n Monitor de VISUALIZACIÓN (donde se muestran los cuadros):")
     if display_monitor:
         # Determinar qué número de monitor es
         monitor_number = None
@@ -496,4 +484,5 @@ except Exception as e:
     print(f"Error al iniciar Tkinter: {e}")
 
     onClossing()
+
 
