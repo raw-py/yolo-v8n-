@@ -468,11 +468,11 @@ try:
             print(f"   - Posición: ({display_monitor['left']}, {display_monitor['top']})")
     else:
         print(f"   - Mismo monitor de captura")
-    print(f"\n🖱️ Movimiento del mouse:")
+    print(f"\n Movimiento del mouse:")
     print(f"   - El mouse se moverá en el Monitor de CAPTURA (Monitor 2)")
     print(f"   - Las coordenadas son proporcionales al monitor de captura")
     print(f"   - Los cuadros se muestran en otro monitor (visualización)")
-    print(f"\n💻 Sistema operativo: {system_os}")
+    print(f"\n Sistema operativo: {system_os}")
     print("="*60)
     print("\n Instrucciones:")
     print("   1. Los cuadros de detección se muestran en el monitor de visualización")
@@ -496,3 +496,4 @@ except Exception as e:
     print(f"Error al iniciar Tkinter: {e}")
 
     onClossing()
+
