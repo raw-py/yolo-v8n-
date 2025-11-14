@@ -32,11 +32,11 @@ available_models = []
 for model_path in model_options:
     if os.path.exists(model_path):
         available_models.append(model_path)
-        print(f"✅ Modelo encontrado localmente: {model_path}")
+        print(f" Modelo encontrado localmente: {model_path}")
 
 if not available_models:
-    print("⚠️ No se encontraron modelos localmente.")
-    print("💡 Intentando descargar automáticamente...")
+    print(" No se encontraron modelos localmente.")
+    print(" Intentando descargar automáticamente...")
     print("   (Si falla, descarga manualmente desde: https://github.com/ultralytics/assets/releases)")
     available_models = model_options  # Intentar todos
 
@@ -47,29 +47,29 @@ for model_path in available_models:
         # Si el archivo no existe, YOLO intentará descargarlo automáticamente
         model = YOLO(model_path)
         model_type = model_path.replace('.pt', '')
-        print(f"✅ Modelo {model_type} cargado exitosamente!")
+        print(f" Modelo {model_type} cargado exitosamente!")
         break
     except Exception as e:
         error_msg = str(e)
         if "Download" in error_msg or "download" in error_msg or "curl" in error_msg.lower():
-            print(f"❌ Error descargando {model_path}: Problema de conexión o permisos")
-            print(f"   💡 Descarga manualmente desde: https://github.com/ultralytics/assets/releases/download/v8.3.0/{model_path}")
+            print(f" Error descargando {model_path}: Problema de conexión o permisos")
+            print(f"   Descarga manualmente desde: https://github.com/ultralytics/assets/releases/download/v8.3.0/{model_path}")
         else:
-            print(f"❌ Error cargando {model_path}: {e}")
+            print(f" Error cargando {model_path}: {e}")
         continue
 
 if model is None:
     print("\n" + "="*60)
-    print("❌ ERROR FATAL: No se pudo cargar ningún modelo")
+    print(" ERROR FATAL: No se pudo cargar ningún modelo")
     print("="*60)
-    print("\n💡 SOLUCIÓN: Descarga manualmente un modelo de YOLO 8")
-    print("\n📥 Descarga uno de estos modelos desde:")
+    print("\n SOLUCIÓN: Descarga manualmente un modelo de YOLO 8")
+    print("\n Descarga uno de estos modelos desde:")
     print("   https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt")
     print("   https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8s.pt")
     print("   https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8m.pt")
-    print("\n📁 Colócalo en el mismo directorio que este script:")
+    print("\n Colócalo en el mismo directorio que este script:")
     print(f"   {os.getcwd()}")
-    print("\n🔄 Luego ejecuta el script principal nuevamente.")
+    print("\n Luego ejecuta el script principal nuevamente.")
     print("="*60)
     sys.exit(1)
 
@@ -104,12 +104,12 @@ if len(sct.monitors) > 2:
 else:
     # Si no hay monitor 2, usar monitor 1 como respaldo
     monitor_area = sct.monitors[1]
-    print(f"⚠️ Solo hay {len(sct.monitors)-1} monitor(es). Usando Monitor 1 como respaldo.")
-    print(f"📹 Capturando desde: Monitor 1 - {monitor_area['width']}x{monitor_area['height']}")
+    print(f" Solo hay {len(sct.monitors)-1} monitor(es). Usando Monitor 1 como respaldo.")
+    print(f" Capturando desde: Monitor 1 - {monitor_area['width']}x{monitor_area['height']}")
 
 # Guardar referencia al monitor de captura para calcular coordenadas del mouse
 capture_monitor = monitor_area
-print(f"🖱️ El mouse se moverá en las coordenadas del monitor de captura: ({capture_monitor['left']}, {capture_monitor['top']})")
+print(f"El mouse se moverá en las coordenadas del monitor de captura: ({capture_monitor['left']}, {capture_monitor['top']})")
 
 # --- Variables globales para Tkinter ---
 root = None
@@ -196,10 +196,10 @@ def move_mouse_to_nearest_box(current_x, current_y):
         try:
             # Mover el mouse a las coordenadas absolutas en la pantalla de captura
             pyautogui.moveTo(nearest_box_center[0], nearest_box_center[1], duration=0.1)
-            print(f"🖱️ Mouse movido a: ({nearest_box_center[0]}, {nearest_box_center[1]}) en Monitor de Captura")
+            print(f" Mouse movido a: ({nearest_box_center[0]}, {nearest_box_center[1]}) en Monitor de Captura")
             print(f"   Coordenadas relativas en frame: ({(nearest_box_center[0] - capture_monitor['left'])}, {(nearest_box_center[1] - capture_monitor['top'])})")
         except Exception as e:
-            print(f"❌ Error moviendo el mouse: {e}")
+            print(f" Error moviendo el mouse: {e}")
 
 def start_mouse_listener():
     """Inicia el listener de mouse en un hilo separado"""
@@ -207,10 +207,10 @@ def start_mouse_listener():
     try:
         mouse_listener = mouse.Listener(on_click=on_mouse_click)
         mouse_listener.start()
-        print("✅ Listener de mouse iniciado. Presiona click izquierdo + derecho para mover el mouse al cuadrado detectado.")
+        print(" Listener de mouse iniciado. Presiona click izquierdo + derecho para mover el mouse al cuadrado detectado.")
     except Exception as e:
-        print(f"⚠️ Error iniciando listener de mouse: {e}")
-        print("💡 La funcionalidad de movimiento de mouse no estará disponible.")
+        print(f" Error iniciando listener de mouse: {e}")
+        print(" La funcionalidad de movimiento de mouse no estará disponible.")
 
 # --- Funciones ---
 def onClossing():
@@ -414,7 +414,7 @@ if len(sct.monitors) > 2:
     else:
         # Si no hay otro monitor, posicionar al lado del monitor de captura
         root.geometry(f"+{capture_monitor['left'] + capture_monitor['width']}+{capture_monitor['top']}")
-        print(f"⚠️ Visualización al lado del monitor de captura")
+        print(f" Visualización al lado del monitor de captura")
 else:
     # Si solo hay un monitor, posicionar al lado
     display_monitor = sct.monitors[1] if len(sct.monitors) > 1 else None
@@ -422,7 +422,7 @@ else:
         root.geometry(f"+{display_monitor['left']}+{display_monitor['top']}")
     else:
         root.geometry(f"+{capture_monitor['left'] + capture_monitor['width']}+{capture_monitor['top']}")
-    print(f"⚠️ Solo hay un monitor. Visualización al lado del monitor de captura")
+    print(f" Solo hay un monitor. Visualización al lado del monitor de captura")
 
 # Hacer la ventana de pantalla completa (compatible con Windows y Linux)
 system_os = platform.system()
@@ -474,7 +474,7 @@ try:
     print(f"   - Los cuadros se muestran en otro monitor (visualización)")
     print(f"\n💻 Sistema operativo: {system_os}")
     print("="*60)
-    print("\n💡 Instrucciones:")
+    print("\n Instrucciones:")
     print("   1. Los cuadros de detección se muestran en el monitor de visualización")
     print("   2. Presiona click IZQUIERDO + DERECHO simultáneamente")
     print("   3. El mouse se moverá al centro de la persona detectada más cercana")
@@ -494,4 +494,5 @@ try:
 
 except Exception as e:
     print(f"Error al iniciar Tkinter: {e}")
+
     onClossing()
