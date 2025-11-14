@@ -16,7 +16,7 @@ print("Cargando modelo YOLO con detección normal...")
 
 # Intentar cargar modelos normales en orden de tamaño
 model_options = [
-    "yolov8n.pt",      # Modelo más pequeño y estable (ya lo tienes)
+    "yolov8n.pt",      # Modelo más pequeño y estable
     "yolov8s.pt",      # Modelo pequeño
     "yolov8m.pt",      # Modelo mediano
     "yolov8l.pt",      # Modelo grande
@@ -99,7 +99,7 @@ else:
     print(f" Solo hay {len(sct.monitors)-1} monitor(es). Usando Monitor 1 como respaldo.")
     print(f" Capturando desde: Monitor 1 - {monitor_area['width']}x{monitor_area['height']}")
 
-# Guardar referencia al monitor de captura para calcular coordenadas del mouse
+# Guardar referencia al monitor 
 capture_monitor = monitor_area
 print(f"El mouse se moverá en las coordenadas del monitor de captura: ({capture_monitor['left']}, {capture_monitor['top']})")
 
@@ -247,7 +247,7 @@ def process_frame():
             
             frame_for_yolo = frame.copy()  # Usar el frame original para YOLO
 
-            # 2. Realizar la detección con YOLO con parámetros optimizados y manejo de errores
+        
             try:
                 results = model.predict(
                     frame_for_yolo,
@@ -278,12 +278,12 @@ def process_frame():
                 if boxes is not None:
                     for i, box in enumerate(boxes):
                         try:
-                            # Obtener coordenadas del bounding box
+                            # Obtener coordenadas del cuadrado
                             x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
                             confidence = box.conf[0].cpu().numpy()
                             class_id = int(box.cls[0].cpu().numpy())
                             
-                            # Verificar si la clase está en la lista de clases a detectar
+                            # Verificar si la clase es correcta
                             if class_id in CLASSES_TO_DETECT:
                                 detection_count += 1
                                 
@@ -417,9 +417,9 @@ system_os = platform.system()
 if system_os == 'Windows':
     root.state('zoomed')  # En Windows
 elif system_os == 'Linux':
-    root.attributes('-zoomed', True)  # En Linux
+    root.attributes('-zoomed', True)  
 else:
-    # Para macOS u otros sistemas
+    
     root.attributes('-zoomed', True)
 
 # Configurar para que esté siempre al frente
